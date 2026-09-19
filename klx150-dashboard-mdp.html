@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="KLX MDP Dash">
+  <meta name="theme-color" content="#050704">
+  <title>KLX 150 Kawasaki Dash - DESIGN BY MDP</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;900&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Leaflet Maps CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-color: #050704;
+      --panel-bg: rgba(12, 17, 10, 0.94);
+      --border-color: #76bb00;
+      --accent-color: #76bb00;
+      --accent-glow: #00ff44;
+      --text-primary: #ffffff;
+      --text-secondary: #a3c293;
+      --success-color: #00ff66;
+      --warning-color: #ffcc00;
+      --danger-color: #ff0044;
+      --font-digital: 'Orbitron', monospace;
+      --font-ui: 'Rajdhani', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      font-family: var(--font-ui);
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(#10170c 15%, transparent 16%) 0 0, radial-gradient(#10170c 15%, transparent 16%) 8px 8px;
+      background-color: #050704;
+      background-size: 16px 16px;
+      z-index: -1;
+    }
+
+    /* Top Branding Header */
+    .dashboard-header {
+      background: rgba(8, 12, 6, 0.96);
+      border-bottom: 2px solid var(--accent-color);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 4px 20px rgba(118, 187, 0, 0.3);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .brand-container {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .brand-header-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badge-klx {
+      font-family: var(--font-digital);
+      font-size: 15px;
+      font-weight: 900;
+      background: var(--accent-color);
+      color: #000000;
+      padding: 4px 10px;
+      border-radius: 4px;
+      letter-spacing: 1px;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .badge-mdp {
+      font-family: var(--font-digital);
+      font-size: 14px;
+      font-weight: 900;
+      color: #ffffff;
+      background: rgba(118, 187, 0, 0.25);
+      border: 1.5px solid var(--accent-color);
+      padding: 3px 10px;
+      border-radius: 4px;
+      letter-spacing: 1.5px;
+      text-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .brand-tagline {
+      font-family: var(--font-ui);
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--accent-color);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px rgba(118, 187, 0, 0.5);
+    }
+
+    .header-right-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .digital-clock {
+      font-family: var(--font-digital);
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .status-indicator .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--warning-color);
+      box-shadow: 0 0 8px var(--warning-color);
+      animation: pulse 1.5s infinite;
+    }
+
+    .status-indicator.active .dot {
+      background: var(--success-color);
+      box-shadow: 0 0 8px var(--success-color);
+      animation: none;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 6px;
+    }
+
+    .icon-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--text-primary);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .icon-btn.active {
+      background: var(--accent-color);
+      color: #000;
+      box-shadow: 0 0 12px var(--accent-color);
+    }
+
+    /* Cockpit Layout (Portrait Default) */
+    .cockpit-container {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .panel-speedometer {
+      background: var(--panel-bg);
+      border: 1.5px solid var(--border-color);
+      border-radius: 16px;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
+    }
+
+    .speed-dial-wrapper {
+      position: relative;
+      width: 250px;
+      height: 250px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gauge-svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(135deg);
+    }
+
+    .gauge-bg {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.08);
+      stroke-width: 18;
+    }
+
+    .gauge-bar {
+      fill: none;
+      stroke: url(#kawasakiGrad);
+      stroke-width: 22;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.15s ease-out;
+      filter: drop-shadow(0 0 10px var(--accent-glow));
+    }
+
+    .speed-display {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .speed-number {
+      font-family: var(--font-digital);
+      font-size: 88px;
+      font-weight: 900;
+      line-height: 1;
+      color: #ffffff;
+      text-shadow: 0 0 24px var(--accent-glow);
+    }
+
+    .speed-unit {
+      font-family: var(--font-digital);
+      font-size: 16px;
+      letter-spacing: 3px;
+      color: var(--accent-color);
+      margin-top: 2px;
+      font-weight: 900;
+    }
+
+    .speed-warning {
+      background: var(--danger-color);
+      color: #fff;
+      font-family: var(--font-digital);
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-top: 4px;
+      animation: flash 0.5s infinite alternate;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .metrics-grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .metric-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .metric-card .label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .metric-card .label i {
+      color: var(--accent-color);
+    }
+
+    .metric-card .value {
+      font-family: var(--font-digital);
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-top: 2px;
+    }
+
+    .metric-card .value small {
+      font-size: 12px;
+      color: var(--accent-color);
+    }
+
+    .panel-map {
+      position: relative;
+      height: 300px;
+      background: var(--panel-bg);
+      border: 1.5px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
+    }
+
+    .map-container {
+      width: 100%;
+      height: 100%;
+      background: #090c07;
+    }
+
+    .leaflet-container {
+      background: #090c07 !important;
+    }
+
+    .leaflet-tile-pane {
+      filter: brightness(0.65) invert(1) contrast(1.3) hue-rotate(200deg) saturate(0.4);
+    }
+
+    .leaflet-control-zoom, .leaflet-control-attribution {
+      display: none !important;
+    }
+
+    .map-controls {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 500;
+    }
+
+    .map-btn {
+      background: rgba(10, 14, 8, 0.9);
+      border: 1px solid var(--border-color);
+      color: #ffffff;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .map-btn.active {
+      background: var(--accent-color);
+      color: #000;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .compass-widget {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      background: rgba(10, 14, 8, 0.9);
+      border: 1px solid var(--border-color);
+      border-radius: 30px;
+      padding: 4px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 500;
+    }
+
+    .compass-arrow {
+      font-size: 18px;
+      color: var(--accent-color);
+      transition: transform 0.2s ease-out;
+    }
+
+    #compass-dir-text {
+      font-family: var(--font-digital);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .rider-marker {
+      width: 32px;
+      height: 32px;
+      background: var(--accent-color);
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000000;
+      box-shadow: 0 0 18px var(--accent-glow);
+    }
+
+    .trip-footer {
+      background: rgba(8, 12, 6, 0.96);
+      border-top: 2px solid var(--border-color);
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      padding: 10px;
+    }
+
+    .trip-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 6px 10px;
+    }
+
+    .trip-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      letter-spacing: 1px;
+    }
+
+    .trip-val {
+      font-family: var(--font-digital);
+      font-size: 17px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .trip-val small {
+      font-size: 11px;
+      color: var(--accent-color);
+    }
+
+    .btn-reset-trip {
+      background: rgba(255, 0, 68, 0.2);
+      border: 1px solid var(--danger-color);
+      color: var(--danger-color);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.4; }
+      50% { opacity: 1; }
+      100% { opacity: 0.4; }
+    }
+
+    @keyframes flash {
+      from { opacity: 1; }
+      to { opacity: 0.3; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header Branding Banner -->
+  <header class="dashboard-header">
+    <div class="brand-container">
+      <div class="brand-header-top">
+        <span class="badge-klx"><i class="fa-solid fa-motorcycle"></i> KLX 150</span>
+        <span class="badge-mdp"><i class="fa-solid fa-code"></i> DESIGN BY MDP</span>
+      </div>
+      <div class="brand-tagline">GO ANYWHERE AND EVERYWHERE</div>
+    </div>
+
+    <div class="header-right-controls">
+      <div id="clock" class="digital-clock">00:00:00</div>
+      <div id="gps-status" class="status-indicator searching">
+        <span class="dot"></span>
+        <span id="gps-text">Mencari GPS</span>
+      </div>
+      <div class="btn-group">
+        <button id="btn-demo-sim" class="icon-btn" title="Simulasi Demo Riding">
+          <i class="fa-solid fa-play"></i>
+        </button>
+        <button id="btn-wakelock" class="icon-btn active" title="Kunci Layar Nyala">
+          <i class="fa-solid fa-sun"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Cockpit Container -->
+  <main class="cockpit-container">
+    <section class="panel-speedometer">
+      <div class="speed-dial-wrapper">
+        <svg class="gauge-svg" viewBox="0 0 300 300">
+          <defs>
+            <linearGradient id="kawasakiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#76bb00" />
+              <stop offset="70%" stop-color="#00ff44" />
+              <stop offset="100%" stop-color="#ccff00" />
+            </linearGradient>
+          </defs>
+          <circle class="gauge-bg" cx="150" cy="150" r="120"></circle>
+          <circle id="gauge-bar" class="gauge-bar" cx="150" cy="150" r="120" stroke-dasharray="754" stroke-dashoffset="754"></circle>
+        </svg>
+
+        <div class="speed-display">
+          <div id="speed-value" class="speed-number">0</div>
+          <div class="speed-unit">KM/H</div>
+          <div id="speed-alert" class="speed-warning hidden">OVERSPEED!</div>
+        </div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <span class="label"><i class="fa-solid fa-mountain"></i> ELEVASI</span>
+          <span id="val-altitude" class="value">-- <small>mdpl</small></span>
+        </div>
+        <div class="metric-card">
+          <span class="label"><i class="fa-solid fa-compass"></i> KOMPAS</span>
+          <span id="val-heading" class="value">--° <small>N</small></span>
+        </div>
+        <div class="metric-card">
+          <span class="label"><i class="fa-solid fa-gauge-high"></i> MAX SPEED</span>
+          <span id="val-max-speed" class="value">0 <small>km/h</small></span>
+        </div>
+        <div class="metric-card">
+          <span class="label"><i class="fa-solid fa-stopwatch"></i> AVG SPEED</span>
+          <span id="val-avg-speed" class="value">0 <small>km/h</small></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel-map">
+      <div id="map" class="map-container"></div>
+      
+      <div class="map-controls">
+        <button id="btn-recenter" class="map-btn active" title="Pusatkan Posisi Motor">
+          <i class="fa-solid fa-location-crosshairs"></i>
+        </button>
+        <button id="btn-map-mode" class="map-btn" title="Ganti Tipe Peta">
+          <i class="fa-solid fa-layer-group"></i>
+        </button>
+      </div>
+
+      <div class="compass-widget">
+        <div id="compass-arrow" class="compass-arrow"><i class="fa-solid fa-location-arrow"></i></div>
+        <span id="compass-dir-text">N</span>
+      </div>
+    </section>
+  </main>
+
+  <footer class="trip-footer">
+    <div class="trip-item">
+      <span class="trip-title">TRIP A</span>
+      <span id="val-trip-a" class="trip-val">0.0 <small>km</small></span>
+      <button class="btn-reset-trip" data-trip="a"><i class="fa-solid fa-rotate-left"></i> RESET</button>
+    </div>
+    <div class="trip-item">
+      <span class="trip-title">TRIP B</span>
+      <span id="val-trip-b" class="trip-val">0.0 <small>km</small></span>
+      <button class="btn-reset-trip" data-trip="b"><i class="fa-solid fa-rotate-left"></i> RESET</button>
+    </div>
+    <div class="trip-item">
+      <span class="trip-title">TOTAL DISTANCE</span>
+      <span id="val-total-dist" class="trip-val">0.0 <small>km</small></span>
+    </div>
+    <div class="trip-item">
+      <span class="trip-title">GPS ACCURACY</span>
+      <span id="val-gps-acc" class="trip-val">-- <small>m</small></span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let state = {
+        currentSpeed: 0,
+        maxSpeed: parseFloat(localStorage.getItem('klx_maxSpeed')) || 0,
+        totalDistance: parseFloat(localStorage.getItem('klx_totalDist')) || 0,
+        tripA: parseFloat(localStorage.getItem('klx_tripA')) || 0,
+        tripB: parseFloat(localStorage.getItem('klx_tripB')) || 0,
+        altitude: 120,
+        heading: 0,
+        gpsAccuracy: 0,
+        lastPosition: null,
+        totalSpeedSum: 0,
+        speedReadingCount: 0,
+        isAutoRecenter: true,
+        isDemoMode: false,
+        demoInterval: null,
+        mapTileIndex: 0,
+        wakeLock: null
+      };
+
+      const elSpeedValue = document.getElementById('speed-value');
+      const elGaugeBar = document.getElementById('gauge-bar');
+      const elSpeedAlert = document.getElementById('speed-alert');
+      const elClock = document.getElementById('clock');
+      const elGpsStatus = document.getElementById('gps-status');
+      const elGpsText = document.getElementById('gps-text');
+      
+      const elValAltitude = document.getElementById('val-altitude');
+      const elValHeading = document.getElementById('val-heading');
+      const elValMaxSpeed = document.getElementById('val-max-speed');
+      const elValAvgSpeed = document.getElementById('val-avg-speed');
+      
+      const elValTripA = document.getElementById('val-trip-a');
+      const elValTripB = document.getElementById('val-trip-b');
+      const elValTotalDist = document.getElementById('val-total-dist');
+      const elValGpsAcc = document.getElementById('val-gps-acc');
+      
+      const elCompassArrow = document.getElementById('compass-arrow');
+      const elCompassDirText = document.getElementById('compass-dir-text');
+      const btnDemoSim = document.getElementById('btn-demo-sim');
+
+      function updateClock() {
+        const now = new Date();
+        const hrs = String(now.getHours()).padStart(2, '0');
+        const mins = String(now.getMinutes()).padStart(2, '0');
+        const secs = String(now.getSeconds()).padStart(2, '0');
+        elClock.textContent = `${hrs}:${mins}:${secs}`;
+      }
+      setInterval(updateClock, 1000);
+      updateClock();
+
+      const GAUGE_MAX_SPEED = 140;
+      const CIRCUMFERENCE = 2 * Math.PI * 120;
+      const MAX_ARC_RATIO = 0.75;
+
+      function updateGauge(speedKmH) {
+        const clampedSpeed = Math.min(Math.max(speedKmH, 0), GAUGE_MAX_SPEED);
+        const speedRatio = clampedSpeed / GAUGE_MAX_SPEED;
+        const dashOffset = CIRCUMFERENCE * (1 - (speedRatio * MAX_ARC_RATIO));
+        elGaugeBar.style.strokeDashoffset = dashOffset;
+        elSpeedValue.textContent = Math.round(clampedSpeed);
+
+        if (clampedSpeed >= 100) {
+          elSpeedAlert.classList.remove('hidden');
+        } else {
+          elSpeedAlert.classList.add('hidden');
+        }
+      }
+
+      updateGauge(0);
+      renderMetrics();
+
+      const tileProviders = [
+        { url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png' },
+        { url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}' }
+      ];
+
+      const initialLat = -6.2088;
+      const initialLng = 106.8456;
+
+      const map = L.map('map', { zoomControl: false, attributionControl: false }).setView([initialLat, initialLng], 16);
+      let currentTileLayer = L.tileLayer(tileProviders[0].url, { maxZoom: 19 }).addTo(map);
+      setTimeout(() => map.invalidateSize(), 500);
+
+      const riderIcon = L.divIcon({
+        className: 'rider-marker-wrapper',
+        html: `<div id="map-rider-icon" class="rider-marker"><i class="fa-solid fa-location-arrow"></i></div>`,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
+      });
+
+      let riderMarker = L.marker([initialLat, initialLng], { icon: riderIcon }).addTo(map);
+
+      if ('geolocation' in navigator) {
+        navigator.geolocation.watchPosition(
+          onPositionSuccess,
+          onPositionError,
+          { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+        );
+      } else {
+        updateGpsStatus('error', 'GPS Tidak Didukung');
+      }
+
+      function onPositionSuccess(pos) {
+        if (state.isDemoMode) return;
+        const crd = pos.coords;
+        
+        state.gpsAccuracy = crd.accuracy;
+        updateGpsStatus(crd.accuracy <= 25 ? 'active' : 'searching', `GPS Aktif (${Math.round(crd.accuracy)}m)`);
+
+        let speedKmH = crd.speed ? crd.speed * 3.6 : 0;
+        state.currentSpeed = speedKmH;
+        updateGauge(speedKmH);
+
+        if (speedKmH > state.maxSpeed) {
+          state.maxSpeed = speedKmH;
+          localStorage.setItem('klx_maxSpeed', state.maxSpeed.toFixed(1));
+        }
+
+        if (speedKmH > 2) {
+          state.totalSpeedSum += speedKmH;
+          state.speedReadingCount++;
+        }
+
+        if (crd.altitude) state.altitude = Math.round(crd.altitude);
+
+        if (state.lastPosition) {
+          const distKm = calculateDistance(state.lastPosition.latitude, state.lastPosition.longitude, crd.latitude, crd.longitude);
+          if (distKm > 0.001 && distKm < 0.5) {
+            state.tripA += distKm;
+            state.tripB += distKm;
+            state.totalDistance += distKm;
+            localStorage.setItem('klx_tripA', state.tripA.toFixed(2));
+            localStorage.setItem('klx_tripB', state.tripB.toFixed(2));
+            localStorage.setItem('klx_totalDist', state.totalDistance.toFixed(2));
+          }
+        }
+        state.lastPosition = { latitude: crd.latitude, longitude: crd.longitude };
+
+        if (crd.heading) updateCompass(crd.heading);
+
+        const newLatLng = [crd.latitude, crd.longitude];
+        riderMarker.setLatLng(newLatLng);
+        if (state.isAutoRecenter) map.panTo(newLatLng, { animate: true, duration: 0.5 });
+        renderMetrics();
+      }
+
+      function onPositionError() {
+        if (!state.isDemoMode) updateGpsStatus('searching', 'Mencari GPS (Buka Mode Demo)');
+      }
+
+      function updateGpsStatus(type, text) {
+        elGpsStatus.className = `status-indicator ${type}`;
+        elGpsText.textContent = text;
+      }
+
+      function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      }
+
+      if (window.DeviceOrientationEvent) {
+        window.addEventListener('deviceorientation', (e) => {
+          let heading = e.webkitCompassHeading || (e.alpha ? 360 - e.alpha : null);
+          if (state.currentSpeed < 3 && heading !== null && !state.isDemoMode) updateCompass(heading);
+        }, true);
+      }
+
+      function updateCompass(deg) {
+        const angle = Math.round(deg) % 360;
+        state.heading = angle;
+        elCompassArrow.style.transform = `rotate(${angle}deg)`;
+        const mapIcon = document.getElementById('map-rider-icon');
+        if (mapIcon) mapIcon.style.transform = `rotate(${angle}deg)`;
+
+        const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+        const idx = Math.round(angle / 45) % 8;
+        elCompassDirText.textContent = dirs[idx];
+        elValHeading.innerHTML = `${angle}° <small>${dirs[idx]}</small>`;
+      }
+
+      function renderMetrics() {
+        elValAltitude.innerHTML = `${state.altitude} <small>mdpl</small>`;
+        elValMaxSpeed.innerHTML = `${Math.round(state.maxSpeed)} <small>km/h</small>`;
+        const avg = state.speedReadingCount > 0 ? (state.totalSpeedSum / state.speedReadingCount) : state.currentSpeed;
+        elValAvgSpeed.innerHTML = `${Math.round(avg)} <small>km/h</small>`;
+
+        elValTripA.innerHTML = `${state.tripA.toFixed(1)} <small>km</small>`;
+        elValTripB.innerHTML = `${state.tripB.toFixed(1)} <small>km</small>`;
+        elValTotalDist.innerHTML = `${state.totalDistance.toFixed(1)} <small>km</small>`;
+        elValGpsAcc.innerHTML = `${Math.round(state.gpsAccuracy)} <small>m</small>`;
+      }
+
+      document.querySelectorAll('.btn-reset-trip').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const t = e.currentTarget.getAttribute('data-trip');
+          if (t === 'a') { state.tripA = 0; localStorage.setItem('klx_tripA', '0'); }
+          if (t === 'b') { state.tripB = 0; localStorage.setItem('klx_tripB', '0'); }
+          renderMetrics();
+        });
+      });
+
+      btnDemoSim.addEventListener('click', () => {
+        state.isDemoMode = !state.isDemoMode;
+        btnDemoSim.classList.toggle('active', state.isDemoMode);
+
+        if (state.isDemoMode) {
+          updateGpsStatus('active', 'Simulasi Riding');
+          let lat = initialLat, lng = initialLng, spd = 45, ang = 45;
+          state.demoInterval = setInterval(() => {
+            spd += (Math.random() * 8 - 4);
+            spd = Math.min(Math.max(spd, 30), 85);
+            state.currentSpeed = spd;
+            updateGauge(spd);
+
+            if (spd > state.maxSpeed) state.maxSpeed = spd;
+            state.totalSpeedSum += spd;
+            state.speedReadingCount++;
+
+            ang += (Math.random() * 6 - 3);
+            const r = ang * Math.PI / 180;
+            lat += Math.cos(r) * 0.00012;
+            lng += Math.sin(r) * 0.00012;
+
+            state.tripA += 0.012;
+            state.tripB += 0.012;
+            state.totalDistance += 0.012;
+            state.gpsAccuracy = 4;
+            state.altitude = 125 + Math.round(Math.sin(Date.now() / 2000) * 15);
+
+            updateCompass(ang);
+            const pos = [lat, lng];
+            riderMarker.setLatLng(pos);
+            if (state.isAutoRecenter) map.panTo(pos, { animate: true, duration: 0.3 });
+            renderMetrics();
+          }, 500);
+        } else {
+          clearInterval(state.demoInterval);
+          updateGpsStatus('searching', 'GPS Idle');
+          state.currentSpeed = 0;
+          updateGauge(0);
+        }
+      });
+
+      async function reqWakeLock() {
+        try {
+          if ('wakeLock' in navigator) state.wakeLock = await navigator.wakeLock.request('screen');
+        } catch(e){}
+      }
+      reqWakeLock();
+      document.getElementById('btn-wakelock').addEventListener('click', () => {
+        if (state.wakeLock) {
+          state.wakeLock.release();
+          state.wakeLock = null;
+          document.getElementById('btn-wakelock').classList.remove('active');
+        } else reqWakeLock();
+      });
+
+      document.getElementById('btn-recenter').addEventListener('click', (e) => {
+        state.isAutoRecenter = !state.isAutoRecenter;
+        e.currentTarget.classList.toggle('active', state.isAutoRecenter);
+      });
+
+      document.getElementById('btn-map-mode').addEventListener('click', () => {
+        state.mapTileIndex = (state.mapTileIndex + 1) % tileProviders.length;
+        map.removeLayer(currentTileLayer);
+        currentTileLayer = L.tileLayer(tileProviders[state.mapTileIndex].url, { maxZoom: 19 }).addTo(map);
+      });
+    });
+  </script>
+</body>
+</html>

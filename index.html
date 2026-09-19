@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="KLX MDP Dash">
+  <meta name="theme-color" content="#070a05">
+  <title>KLX 150 Kawasaki Dash - DESIGN BY MDP</title>
+
+  <!-- Google Fonts: Orbitron & Rajdhani -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;900&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Leaflet CSS for Maps -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css?v=mdp_v3">
+</head>
+<body class="theme-kawasaki">
+  <!-- Prominent Branding Banner -->
+  <header class="dashboard-header">
+    <div class="brand-container">
+      <div class="brand-header-top">
+        <span class="badge-klx"><i class="fa-solid fa-motorcycle"></i> KLX 150</span>
+        <span class="badge-mdp"><i class="fa-solid fa-code"></i> DESIGN BY MDP</span>
+      </div>
+      <div class="brand-tagline">GO ANYWHERE AND EVERYWHERE</div>
+    </div>
+
+    <div class="header-right-controls">
+      <div id="clock" class="digital-clock">00:00:00</div>
+      <div id="gps-status" class="status-indicator searching">
+        <span class="dot"></span>
+        <span id="gps-text">Mencari GPS</span>
+      </div>
+      <div class="btn-group">
+        <button id="btn-demo-sim" class="icon-btn" title="Simulasi Demo (Mode Tes)">
+          <i class="fa-solid fa-play"></i>
+        </button>
+        <button id="btn-wakelock" class="icon-btn active" title="Kunci Layar Nyala">
+          <i class="fa-solid fa-sun"></i>
+        </button>
+        <button id="btn-theme" class="icon-btn" title="Ganti Tema Warna">
+          <i class="fa-solid fa-palette"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Cockpit Container (Default Portrait Stacked Layout) -->
+  <main class="cockpit-container">
+    <!-- Panel Speedometer (Top) -->
+    <section class="panel-speedometer">
+      <div class="speed-dial-wrapper">
+        <svg class="gauge-svg" viewBox="0 0 300 300">
+          <defs>
+            <linearGradient id="kawasakiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#76bb00" />
+              <stop offset="70%" stop-color="#00ff44" />
+              <stop offset="100%" stop-color="#ccff00" />
+            </linearGradient>
+          </defs>
+          <circle class="gauge-bg" cx="150" cy="150" r="120"></circle>
+          <circle id="gauge-bar" class="gauge-bar" cx="150" cy="150" r="120" stroke-dasharray="754" stroke-dashoffset="754"></circle>
+        </svg>
+
+        <div class="speed-display">
+          <div id="speed-value" class="speed-number">0</div>
+          <div class="speed-unit">KM/H</div>
+          <div id="speed-alert" class="speed-warning hidden">OVERSPEED!</div>
+        </div>
+      </div>
+
+      <!-- Telemetry Metrics Grid (2x2) -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <span class="label"><i class="fa-solid fa-mountain"></i> ELEVASI</span>
+          <span id="val-altitude" class="value">-- <small>mdpl</small></span>
+        </div>
+        <div class="metric-card">
+          <span class="label"><i class="fa-solid fa-compass"></i> KOMPAS</span>
+          <span id="val-heading" class="value">--° <small>N</small></span>
+        </div>
+        <div class="metric-card">
+          <span class="label"><i class="fa-solid fa-gauge-high"></i> MAX SPEED</span>
+          <span id="val-max-speed" class="value">0 <small>km/h</small></span>
+        </div>
+        <div class="metric-card">
+          <span class="label"><i class="fa-solid fa-stopwatch"></i> AVG SPEED</span>
+          <span id="val-avg-speed" class="value">0 <small>km/h</small></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Panel Map Navigation -->
+    <section class="panel-map">
+      <div id="map" class="map-container"></div>
+      
+      <div class="map-controls">
+        <button id="btn-recenter" class="map-btn active" title="Pusatkan Posisi Motor">
+          <i class="fa-solid fa-location-crosshairs"></i>
+        </button>
+        <button id="btn-map-mode" class="map-btn" title="Ganti Tipe Peta">
+          <i class="fa-solid fa-layer-group"></i>
+        </button>
+      </div>
+
+      <div class="compass-widget">
+        <div id="compass-arrow" class="compass-arrow"><i class="fa-solid fa-location-arrow"></i></div>
+        <span id="compass-dir-text">N</span>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bottom Trip Bar -->
+  <footer class="trip-footer">
+    <div class="trip-item">
+      <span class="trip-title">TRIP A</span>
+      <span id="val-trip-a" class="trip-val">0.0 <small>km</small></span>
+      <button class="btn-reset-trip" data-trip="a"><i class="fa-solid fa-rotate-left"></i> RESET</button>
+    </div>
+    <div class="trip-item">
+      <span class="trip-title">TRIP B</span>
+      <span id="val-trip-b" class="trip-val">0.0 <small>km</small></span>
+      <button class="btn-reset-trip" data-trip="b"><i class="fa-solid fa-rotate-left"></i> RESET</button>
+    </div>
+    <div class="trip-item">
+      <span class="trip-title">TOTAL DISTANCE</span>
+      <span id="val-total-dist" class="trip-val">0.0 <small>km</small></span>
+    </div>
+    <div class="trip-item">
+      <span class="trip-title">GPS ACCURACY</span>
+      <span id="val-gps-acc" class="trip-val">-- <small>m</small></span>
+    </div>
+  </footer>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js?v=mdp_v3"></script>
+</body>
+</html>
